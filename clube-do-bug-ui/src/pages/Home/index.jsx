@@ -7,9 +7,11 @@ function HomePage() {
   const [validateSideBar, setValidateSideBar] = useState(0);
 
   return (
-    <Page validateSideBar={validateSideBar} setValidateSideBar={setValidateSideBar}>        
-      <Home />
-    </Page>
+    <HomeProvider>
+      <Page validateSideBar={validateSideBar} setValidateSideBar={setValidateSideBar}>        
+        <Home />
+      </Page>
+    </HomeProvider>
   );
 }
 

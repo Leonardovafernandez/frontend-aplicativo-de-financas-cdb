@@ -19,10 +19,12 @@ function MainRoutes() {
     return (
         <Routes>
             <Route path='/' element={<MainContextProvider><App /></MainContextProvider>} />
-            <Route path='/Home' element={<HomeProvider><HomePage /></HomeProvider>} />
-            <Route path='/Clients/:status' element={<HomeProvider><ClientsPage /></HomeProvider>} />
-            <Route path='/Clients/detalhamento/:id/:name' element={<HomeProvider><ClientDetailPage /></HomeProvider>} />
-            <Route path='/Charges/:status' element={<HomeProvider><ChargesPage /></HomeProvider>} />
+            <Route element={<ProtectedRoutes redirectTo='/' />} >
+                <Route path='/Home' element={<HomePage />} />
+                <Route path='/Clients/:status' element={<HomeProvider><ClientsPage /></HomeProvider>} />
+                <Route path='/Clients/detalhamento/:id/:name' element={<HomeProvider><ClientDetailPage /></HomeProvider>} />
+                <Route path='/Charges/:status' element={<HomeProvider><ChargesPage /></HomeProvider>} />
+            </Route>
             <Route path='*' element={<MainContextProvider><App /></MainContextProvider>} />
         </Routes>
     )
