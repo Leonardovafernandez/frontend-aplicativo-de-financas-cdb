@@ -10,6 +10,15 @@
   box-sizing: border-box;
 }
 
+*::-webkit-scrollbar {
+  width: 1rem;
+  background-color: rgba(240, 240, 245, 1)
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: rgb(218, 1, 117, .2);
+}
+
 html {
   font-size: 62.5%;
 }

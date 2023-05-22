@@ -15,6 +15,8 @@ import TableAnimation from "../../General/TableAnimation";
 import btnDelete from './assets/btn-delete.svg';
 import btnEdit from './assets/btn-edit.svg';
 import btnOrderCharges from './assets/filter.svg';
+import { getItem } from '../../../utils/storage';
+import formatCentsIntoReais from "../../../utils/formatCentsIntoReais";
 import './style.css';
 
 export default function ChargesTable() {
@@ -23,13 +25,14 @@ export default function ChargesTable() {
   const {
     chargeList, setChargesList, setIsModalChargeDetail, isModalDeleteCharge,
     setIsModalDeleteCharge, setCurrentCharge, updateRender,
-    setIsModalEditRegisterCharge, setCurrentClient, isBillingTableLookupNotFound,
+    setIsModalEditRegisterCharge, isBillingTableLookupNotFound,
     setIsBillingTableLookupNotFound
   } = useHome();
 
   const [sortById, setSortById] = useState(true);
   const [sortByClient, setSortByClient] = useState(true);
   const [order, setOrder] = useState(1);
+  const [dateOrder, setDateOrder] = useState('crescent');
   const [isLoadingAnimation, setIsLoadingAnimation] = useState(false);
 
   function sortBynumber() {
@@ -61,6 +64,26 @@ export default function ChargesTable() {
     return;
   };
 
+  function sortByDate() {
+
+    const data = [...chargeList]
+
+    const comparator = (a, b) => {
+      const dataA = new Date(a.due_date.split('/').reverse().join('-'));
+      const dataB = new Date(b.due_date.split('/').reverse().join('-'));
+      if (dateOrder === 'crescent') {
+        setDateOrder('decrescent');
+        return dataA - dataB;
+      } else {
+        setDateOrder('crescent');
+        return dataB - dataA;
+      }
+    };
+
+    data.sort(comparator);
+    return setChargesList(data)
+  }
+
   function openModalDeleteCharge(charge) {
     setCurrentCharge(charge)
     setIsModalDeleteCharge(true)
@@ -74,19 +97,19 @@ export default function ChargesTable() {
 
   function openModalEditCharge(charge) {
     setIsModalEditRegisterCharge(true);
-    setCurrentClient(charge);
+    setCurrentCharge(charge);
   }
 
   async function getChargesList() {
-    const { data: allCharges } = await api.get('/charge', { headers: { Authorization: `Bearer ${localStorage.getItem("token")}`, }});
+
+    const { data: allCharges } = await api.get('/charge', { headers: { Authorization: `Bearer ${getItem("token")}`, } });
 
     return allCharges;
   };
 
-
   async function getBillsPaid() {
     try {
-      const { data: paidCharges } = (await api.get('/charge/paid', { headers: { Authorization: `Bearer ${localStorage.getItem("token")}`, }}));
+      const { data: paidCharges } = (await api.get('/charge/paid', { headers: { Authorization: `Bearer ${getItem("token")}`, } }));
 
       return paidCharges;
 
@@ -97,7 +120,7 @@ export default function ChargesTable() {
 
   async function getPendingCharges() {
     try {
-      const { data: pendingCharges } = (await api.get('/charge/pending', { headers: { Authorization: `Bearer ${localStorage.getItem("token")}`, }}));
+      const { data: pendingCharges } = (await api.get('/charge/pending', { headers: { Authorization: `Bearer ${getItem("token")}`, } }));
 
       return pendingCharges;
 
@@ -108,7 +131,7 @@ export default function ChargesTable() {
 
   async function getOverdueCharges() {
     try {
-      const { data: overdueCharges } = (await api.get('/charge/expired', { headers: { Authorization: `Bearer ${localStorage.getItem("token")}`, }}));
+      const { data: overdueCharges } = (await api.get('/charge/expired', { headers: { Authorization: `Bearer ${getItem("token")}`, } }));
 
       return overdueCharges;
 
@@ -192,7 +215,14 @@ export default function ChargesTable() {
               <span className='subtitle'>Valor</span>
             </TableCell>
             <TableCell>
-              <span className='subtitle'>Data de venc.</span>
+              <div className='flex-row align-center' style={{ gap: '1rem' }}>
+                <img
+                  className='pointer'
+                  onClick={() => { sortByDate() }}
+                  src={btnOrderCharges}
+                  alt='Botão ordenar cobranças na tabela' />
+                <span className='subtitle'>Data de venc.</span>
+              </div>
             </TableCell>
             <TableCell>
               <span className='subtitle'>Status</span>
@@ -222,7 +252,7 @@ export default function ChargesTable() {
                   <span className='gray6 medium-body'>{charge.id}</span>
                 </TableCell>
                 <TableCell >
-                  <span className='gray6 medium-body'>R$ {Number(charge.value).toFixed(2)}</span>
+                  <span className='gray6 medium-body'>R$ {formatCentsIntoReais(charge.value)}</span>
                 </TableCell>
                 <TableCell >
                   <span className='gray6 medium-body'>{charge.due_date}</span>

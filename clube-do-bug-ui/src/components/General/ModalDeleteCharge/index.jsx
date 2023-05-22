@@ -3,6 +3,7 @@ import closeIcon from './assets/close-icon.svg';
 import alertIcon from './assets/alert-icon.svg';
 import useHome from '../../../hooks/useHome';
 import api from '../../../services/api';
+import { getItem } from '../../../utils/storage';
 
 export default function ModalDeleteCharge() {
   const { setIsModalDeleteCharge, currentCharge,
@@ -19,7 +20,7 @@ export default function ModalDeleteCharge() {
 
     try {
 
-      await api.delete(`/charge/${currentCharge.id}`, { headers: { Authorization: `Bearer ${localStorage.getItem("token")}`, }})
+      await api.delete(`/charge/${currentCharge.id}`, { headers: { Authorization: `Bearer ${getItem("token")}`, } })
 
       setIsModalDeleteCharge(false)
       setIsPopup(true)

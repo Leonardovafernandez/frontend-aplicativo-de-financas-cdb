@@ -5,6 +5,8 @@ import fileIcon from './assets/file-icon.svg';
 import checkIcon from './assets/check-icon.svg'
 import { useEffect, useState } from 'react';
 import api from '../../../services/api';
+import formatCentsIntoReais from "../../../utils/formatCentsIntoReais";
+import { getItem } from '../../../utils/storage';
 
 export default function ModalRegisterCharge() {
   const {
@@ -47,10 +49,11 @@ export default function ModalRegisterCharge() {
       return
     }
 
-    if (name === 'value' && value.length < 2 && !value.includes('R$')) {
-      setFormCharge({ ...formCharge, [name]: `R$ ${value}` })
-      return
+    if (name === "value") {
+      setFormCharge({ ...formCharge, [name]: `R$ ${formatCentsIntoReais(value.replace(/[^0-9]/g, ''))}` })
+      return;
     }
+
     setFormCharge({ ...formCharge, [name]: value })
   }
 
@@ -67,7 +70,7 @@ export default function ModalRegisterCharge() {
       return setChargeError('Este campo deve ser preenchido.')
     }
 
-    const valueFormated = formCharge.value.replace("R$", "").trim();
+    const valueFormated = formCharge.value.replace(/[^0-9]/g, '').trim();
 
     const newCharge = {
       ...formCharge,
@@ -75,7 +78,7 @@ export default function ModalRegisterCharge() {
     }
 
     try {
-      await api.post(`/charge/${id}`, newCharge, { headers: { Authorization: `Bearer ${localStorage.getItem("token")}`, }})
+      await api.post(`/charge/${id}`, newCharge, { headers: { Authorization: `Bearer ${getItem("token")}`, } })
       setPopupMessage('Cobrança cadastrada com sucesso')
       setIsPopup(true)
       setIsModalRegisterCharge(false)
@@ -160,7 +163,7 @@ export default function ModalRegisterCharge() {
                 }
                 placeholder='Digite o valor'
                 name='value'
-                value={formCharge.value}
+                value={`${formCharge.value}`}
                 onChange={handleFormCharge}
               />
               {!formCharge.value && <span className="red-error small-body">{chargeError}</span>}

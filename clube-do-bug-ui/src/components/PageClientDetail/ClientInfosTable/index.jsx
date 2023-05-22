@@ -30,7 +30,9 @@ export default function ClientInfosTable() {
           <span className='title3-b'>Dados do cliente</span>
           <button className='bg-gray8 btn-cancel green width100'
             onClick={() => setIsModalEditRegisterClient(true)}
-          >Editar cliente</button>
+          >
+            Editar cliente
+          </button>
         </div>
 
         <ThemeProvider theme={theme}>
@@ -53,18 +55,19 @@ export default function ClientInfosTable() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                <TableCell>
-                  <span className='body'>{currentClient.email}</span>
-                </TableCell>
-                <TableCell>
-                  <span className='body'>{currentClient.phone}</span>
-                </TableCell>
-                <TableCell>
-                  <span className='body'>{currentClient.cpf}</span>
-                </TableCell>
+                <TableRow>
+                  <TableCell>
+                    <span className='body'>{currentClient.email}</span>
+                  </TableCell>
+                  <TableCell>
+                    <span className='body'>{currentClient.phone}</span>
+                  </TableCell>
+                  <TableCell>
+                    <span className='body'>{currentClient.cpf}</span>
+                  </TableCell>
+                </TableRow>
               </TableBody>
-              <div className='margin-t-57' />
-              <TableHead>
+              <TableHead sx={{ marginTop: '57px' }}>
                 <TableRow>
                   <TableCell>
                     <span className='subtitle'>Endereço</span>
@@ -88,24 +91,25 @@ export default function ClientInfosTable() {
               </TableHead>
 
               <TableBody>
-                <TableCell>
-                  <span className='body'>{currentClient.address ? currentClient.address : '--'}</span>
-                </TableCell>
-                <TableCell>
-                  <span className='body'>{currentClient.neighborhood ? currentClient.neighborhood : '--'}</span>
-                </TableCell>
-                <TableCell>
-                  <span className='body'>{currentClient.complement ? currentClient.complement : '--'}</span>
-                </TableCell>
-                <TableCell>
-                  <span className='body'>{currentClient.zip_code ? currentClient.zip_code : '--'}</span>
-                </TableCell>
-                <TableCell>
-                  <span className='body'>{currentClient.city ? currentClient.city : '--'}</span>
-                </TableCell>
-                <TableCell>
-                  <span className='body'>{currentClient.state ? currentClient.state : '--'}</span>
-                </TableCell>
+                <TableRow>
+                  <TableCell>
+                    <span className='body'>{currentClient.address ? currentClient.address : '--'}</span>
+                  </TableCell>
+                  <TableCell>
+                    <span className='body'>{currentClient.neighborhood ? currentClient.neighborhood : '--'}</span>
+                  </TableCell>
+                  <TableCell>
+                    <span className='body'>{currentClient.complement ? currentClient.complement : '--'}</span>
+                  </TableCell>
+                  <TableCell>
+                    <span className='body'>{currentClient.zip_code ? currentClient.zip_code : '--'}</span>
+                  </TableCell>
+                  <TableCell>
+                    <span className='body'>{currentClient.city ? currentClient.city : '--'}</span>
+                  </TableCell>
+                  <TableCell>
+                    <span className='body'>{currentClient.state ? currentClient.state : '--'}</span>
+                  </TableCell></TableRow>
               </TableBody>
             </Table>
           </TableContainer>

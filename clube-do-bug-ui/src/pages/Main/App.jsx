@@ -17,9 +17,9 @@ export default function Main() {
           <StepperVertical />
         </div>
       </div>}
-      {login && <div>
+      {login && <>
         <div className='login' />
-      </div>}
+      </>}
       <div className="form flex-column justify-between center">
         <div>
           {!login && <>
@@ -28,11 +28,12 @@ export default function Main() {
             {activeStep === 2 && <StepTrhee />}
           </>}
           {login && <Login />}
-
-          <div className='flex-column align-center margin-t-249'>
-            {!login && <HorizontalStep />}
-          </div>
         </div>
+        {!login &&
+          <div className='flex-column align-center margin-top-180'>
+            <HorizontalStep />
+          </div>
+        }
       </div>
     </div>
   )

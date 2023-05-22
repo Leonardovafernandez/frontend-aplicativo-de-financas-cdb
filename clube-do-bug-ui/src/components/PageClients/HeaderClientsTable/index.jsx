@@ -5,6 +5,7 @@ import filter from './assets/filter.svg';
 import people from './assets/people.svg';
 import searchIcon from './assets/search-icon.svg';
 import './style.css';
+import { getItem } from "../../../utils/storage";
 
 function HeaderClientsTable() {
   const {
@@ -16,7 +17,8 @@ function HeaderClientsTable() {
 
   const customerFilter = async () => {
     try {
-      const { data: filteredCustomers } = await api.get(`/client?search=${search}`);
+      const { data: filteredCustomers } = await api.get(`/client?search=${search}`,
+        { headers: { Authorization: `Bearer ${getItem("token")}`, } });
 
       if (filteredCustomers.length > 0) {
         if (isCustomerTableSearchNotFound) setIsCustomerTableSearchNotFound(false);

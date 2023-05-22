@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import useHome from "../../../hooks/useHome";
 import api from '../../../services/api';
+import { getItem } from '../../../utils/storage'
 import fileIcon from './assets/file-icon.svg';
 import closeIcon from './assets/close-icon.svg';
 import checkIcon from './assets/check-icon.svg';
+import formatCentsIntoReais from "../../../utils/formatCentsIntoReais";
 import './style.css';
 
 export default function ModalEditRegisterCharge() {
@@ -15,7 +17,7 @@ export default function ModalEditRegisterCharge() {
     const [checked, setChecked] = useState(true);
     const [formCharge, setFormCharge] = useState({
         description: currentCharge.description,
-        value: currentCharge.value,
+        value: formatCentsIntoReais(currentCharge.value.replace(/[^0-9]/g, '')),
         status: Boolean,
         due_date: currentCharge.due_date
     });
@@ -61,16 +63,17 @@ export default function ModalEditRegisterCharge() {
             return
         }
 
-        if (name === 'value' && value.length < 2 && !value.includes('R$')) {
-            setFormCharge({ ...formCharge, [name]: `R$ ${value}` })
-            return
+        if ("value" === name) {
+            setFormCharge({ ...formCharge, [name]: `${formatCentsIntoReais(value.replace(/[^0-9]/g, ''))}` })
+            return;
         }
+
         setFormCharge({ ...formCharge, [name]: value })
     };
 
     async function updateCharge() {
         formCharge.status = checked
-        const valueFormated = formCharge.value.replace("R$", "").trim()
+        const valueFormated = formCharge.value.replace(/[^0-9]/g, '').trim();
 
         if (!formCharge.description) {
             return setChargeErrors({ ...chargeErrors, description: "Este campo deve ser preenchido" })
@@ -90,7 +93,8 @@ export default function ModalEditRegisterCharge() {
         }
 
         try {
-            await api.put(`/charge/${currentClient.id}`, newUpdateCharge, { headers: { Authorization: `Bearer ${localStorage.getItem("token")}`, }})
+            await api.put(`/charge/${currentCharge.id}`, newUpdateCharge,
+                { headers: { Authorization: `Bearer ${getItem("token")}`, } })
             setPopupMessage('Cobrança editada com sucesso!')
             setIsPopup(true)
             setIsModalEditRegisterCharge(false)
@@ -173,7 +177,7 @@ export default function ModalEditRegisterCharge() {
                                 }
                                 placeholder='Digite o valor'
                                 name='value'
-                                value={formCharge.value}
+                                value={`R$ ${formCharge.value}`}
                                 onChange={handleFormCharge}
                             />
                             {chargeErrors.value && <span className="red-error small-body">{chargeErrors.value}</span>}

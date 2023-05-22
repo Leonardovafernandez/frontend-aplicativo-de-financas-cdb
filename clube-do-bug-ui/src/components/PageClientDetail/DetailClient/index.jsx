@@ -8,26 +8,29 @@ import Popup from '../../General/Popup';
 import ClientsDetails from '../ClientsDetails';
 import api from '../../../services/api';
 import "./style.css";
+import { getItem } from '../../../utils/storage';
+import ModalDeleteCharge from '../../General/ModalDeleteCharge';
+import ClientInfosTable from '../ClientInfosTable';
+import ClientChargesTable from '../ClientChargesTable';
 
 function DetailClient() {
   const { id } = useParams();
-  const { isModalEditRegisterClient, isPopup, setIsPopup, isModalRegisterCharge, isModalEditRegisterCharge, setCurrentClient, setShowAllClients } = useHome();
+  const { isModalEditRegisterClient, isPopup, setIsPopup, isModalRegisterCharge, isModalEditRegisterCharge, setCurrentClient, setShowAllClients, updateRender, isModalDeleteCharge } = useHome();
 
   async function getClientById() {
     try {
-      const { data: client } = (await api.get(`/client/${id}`, { headers: { Authorization: `Bearer ${localStorage.getItem("token")}`, }}));
+      const { data: client } = (await api.get(`/client/${id}`, { headers: { Authorization: `Bearer ${getItem("token")}`, } }));
       setCurrentClient(client);
     } catch (error) {
       console.log(error);
       return;
     }
-    
   }
 
   useEffect(() => {
     setShowAllClients(false);
     getClientById();
-  }, [])
+  }, [updateRender])
 
   useEffect(() => {
     setTimeout(() => {
@@ -36,12 +39,14 @@ function DetailClient() {
   }, [isPopup])
 
   return (
-    <div  className='container-clients'>
-            {isModalRegisterCharge && <ModalRegisterCharge />}
-            {isPopup && <Popup />}
-            <ClientsDetails />
-            {isModalEditRegisterClient && <ModalEditRegisterClient />}
-            {isModalEditRegisterCharge && <ModalEditRegisterCharge />}
+    <div className='container-clients'>
+      {isModalRegisterCharge && <ModalRegisterCharge />}
+      {isPopup && <Popup />}
+      {isModalDeleteCharge && <ModalDeleteCharge />}
+      <ClientInfosTable />
+      <ClientChargesTable />
+      {isModalEditRegisterClient && <ModalEditRegisterClient />}
+      {isModalEditRegisterCharge && <ModalEditRegisterCharge />}
     </div>
   );
 }

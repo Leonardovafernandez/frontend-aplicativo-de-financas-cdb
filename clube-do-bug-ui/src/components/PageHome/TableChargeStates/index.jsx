@@ -6,6 +6,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import { useNavigate } from 'react-router-dom';
+import formatCentsIntoReais from "../../../utils/formatCentsIntoReais.js";
 import './style.css';
 
 function TableChargeStates({ infoCharge }) {
@@ -69,7 +70,7 @@ function TableChargeStates({ infoCharge }) {
                   <span className='gray6 medium-body'>{row.name.slice(0, 15)}</span>
                 </TableCell>
                 <TableCell align="center"><span className='gray6 medium-body'>{row.id}</span></TableCell>
-                <TableCell align="center"><span className='gray6 medium-body'>R$ {row.value},00</span></TableCell>
+                <TableCell align="center"><span className='gray6 medium-body'>R$ {formatCentsIntoReais(row.value)}</span></TableCell>
               </TableRow>
             ))
           }

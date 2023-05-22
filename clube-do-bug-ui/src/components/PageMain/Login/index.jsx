@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import SimpleBackdrop from '../../General/BackdropLoading';
 import useMain from '../../../hooks/useMain';
 import api from '../../../services/api';
 import { setItem } from '../../../utils/storage';
@@ -8,7 +8,6 @@ import objects from './objects';
 import IconEyeClose from "./assets/eye-close.svg";
 import IconEyeOpen from "./assets/eye-open.svg";
 import './style.css';
-import SeePassword from '../../../assets/see-password.svg';
 
 function Login() {
   const [imgEyePassword, setImgEyePassword] = useState(IconEyeClose);
@@ -20,6 +19,7 @@ function Login() {
   const [errorMessageServer, setErrorMessageServer] = useState('');
 
   const [showPassword, setShowPassword] = useState(false)
+  const [openBackdrop, setOpenBackdrop] = useState(false);
 
   const handleShowHidePassword = (e) => {
     setShowPassword(!showPassword)
@@ -159,7 +159,7 @@ function Login() {
     const thereWasAnError = validateFieldsFormLogin(form);
 
     if (thereWasAnError) return;
-
+    setOpenBackdrop(true)
     try {
       const { status, data } = await api.post('/login', form);
       if (status == 200) {
@@ -168,6 +168,7 @@ function Login() {
         navigate('/home')
       }
     } catch (error) {
+      setOpenBackdrop(false)
       showErrorsServer(error);
     }
   }
@@ -192,22 +193,22 @@ function Login() {
           <a className='link pink' href="#">Esqueceu a senha?</a>
         </div>
         <div>
-        <input
-          className='input margin-t-6'
-          type={typeOfPassword}
-          placeholder="Digite sua senha"
-          name='password'
-          value={form.password}
-          autoComplete="on"
-          onChange={(event) => handleForm(event)}
-          onFocus={() => clearErrorOneMessage("password")}
-        />
-        <img
-          className="img-eye"
-          src={imgEyePassword}
-          alt="eye"
-          onClick={handleChangePasswordVisibility}
-        />
+          <input
+            className='input margin-t-6'
+            type={typeOfPassword}
+            placeholder="Digite sua senha"
+            name='password'
+            value={form.password}
+            autoComplete="on"
+            onChange={(event) => handleForm(event)}
+            onFocus={() => clearErrorOneMessage("password")}
+          />
+          <img
+            className="img-eye"
+            src={imgEyePassword}
+            alt="eye"
+            onClick={handleChangePasswordVisibility}
+          />
         </div>
         <span className='red-error margin-t-6'>{errorMessages.password}</span>
         <span className='align-self-center margin-t-6 red-error'>{errorMessageServer}</span>
@@ -217,6 +218,12 @@ function Login() {
           type='button'>
           Entrar
         </button>
+
+        <SimpleBackdrop
+          openBackdrop={openBackdrop}
+          setOpenBackdrop={setOpenBackdrop}
+        />
+
         <span className="gray2 margin-t-15 center subtitle-login"
         >Ainda não possui uma conta?
           <a className='link pink' onClick={handleSignUp}> Cadastre-se</a>

@@ -5,8 +5,10 @@ import searchIcon from './assets/magnifyGlassIcon.svg';
 import api from '../../../services/api';
 import useHome from '../../../hooks/useHome';
 import { useState } from 'react';
+import { getItem } from '../../../utils/storage';
 
 function HeaderChargesTable() {
+
     const {
         setChargesList, getChargesList, isBillingTableLookupNotFound, setIsBillingTableLookupNotFound
     } = useHome();
@@ -15,8 +17,9 @@ function HeaderChargesTable() {
 
     const chargesFilter = async () => {
         try {
-            const { data: filteredCharges } = await api.get(`/charge?search=${search}`);
-
+            const { data: filteredCharges } = await api.get(`/charge?search=${search}`,
+                { headers: { Authorization: `Bearer ${getItem("token")}`, } }
+            );
 
             if (filteredCharges.length > 0) {
                 if (isBillingTableLookupNotFound) setIsBillingTableLookupNotFound(false);
@@ -26,7 +29,6 @@ function HeaderChargesTable() {
             }
 
             setIsBillingTableLookupNotFound(true);
-
         } catch (error) {
             return console.log(error)
         }

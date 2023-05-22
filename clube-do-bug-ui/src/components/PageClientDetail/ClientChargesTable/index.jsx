@@ -13,6 +13,8 @@ import btnOrderClients from './assets/btn-order-clients.svg';
 import DeleteClient from './assets/delete-client.svg';
 import EditClient from './assets/edit-client.svg';
 import './style.css';
+import { getItem } from '../../../utils/storage';
+import formatCentsIntoReais from '../../../utils/formatCentsIntoReais';
 
 export default function ClientChargesTable() {
   const { id } = useParams();
@@ -23,13 +25,13 @@ export default function ClientChargesTable() {
     }
   })
 
-  const { currentClient, setIsModalEditRegisterCharge, setIsModalRegisterCharge,
-    chargeList, setCurrentClient,
-    setIsModalDeleteCharge, setCurrentCharge, updateRender } = useHome();
+  const { setIsModalEditRegisterCharge, setIsModalRegisterCharge,
+    chargeList, setIsModalDeleteCharge, setCurrentCharge, updateRender } = useHome();
 
+  const [order, setOrder] = useState('crescent');
   const [clientCharges, setClientCharges] = useState([]);
 
-  function openModalDeleteCharge(charge) {
+  const openModalDeleteCharge = (charge) => {
     setCurrentCharge(charge)
     setIsModalDeleteCharge(true)
   }
@@ -41,20 +43,64 @@ export default function ClientChargesTable() {
 
   const getClientCharges = async () => {
     try {
-      const { data } = await api.get(`/charge/${id}`, { headers: { Authorization: `Bearer ${localStorage.getItem("token")}`, }})
-      setClientCharges(data)
+      const { data } = await api.get(`/charge/${id}`, { headers: { Authorization: `Bearer ${getItem("token")}`, } })
 
+      let i = 1;
+      data.forEach(charge => {
+        charge.chargeId = i++
+      })
+      setClientCharges(data)
     } catch (error) {
       return console.log(error);
     }
   }
 
   async function getChargesList() {
-    const { data: allCharges } = await api.get('/charge', { headers: { Authorization: `Bearer ${localStorage.getItem("token")}`, }});
+    const { data: allCharges } = await api.get('/charge', { headers: { Authorization: `Bearer ${getItem("token")}`, } });
 
     return allCharges;
   };
 
+  const orderById = () => {
+    const data = [...clientCharges];
+
+    const comparator = (a, b) => {
+      const dataA = a.id;
+      const dataB = b.id;
+
+      if (order === 'crescent') {
+        setOrder('decrescent');
+        return dataA - dataB;
+      } else {
+        setOrder('crescent');
+        return dataB - dataA;
+      }
+    };
+
+    data.sort(comparator);
+    return setClientCharges(data)
+  }
+
+  const orderByDate = () => {
+
+    const data = [...clientCharges]
+
+    const comparator = (a, b) => {
+      const dataA = new Date(a.due_date.split('/').reverse().join('-'));
+      const dataB = new Date(b.due_date.split('/').reverse().join('-'));
+
+      if (order === 'crescent') {
+        setOrder('decrescent');
+        return dataA - dataB;
+      } else {
+        setOrder('crescent');
+        return dataB - dataA;
+      }
+    };
+
+    data.sort(comparator);
+    return setClientCharges(data)
+  }
 
   useEffect(() => {
     getChargesList();
@@ -75,13 +121,23 @@ export default function ClientChargesTable() {
               <TableRow>
                 <TableCell>
                   <div className='flex-row align-center' style={{ gap: '1rem' }}>
-                    <img src={btnOrderClients} alt='Botão ordenar clientes na tabela' />
+                    <img
+                      src={btnOrderClients}
+                      alt='Botão ordenar clientes na tabela'
+                      style={{ cursor: 'pointer' }}
+                      onClick={() => orderById()}
+                    />
                     <span className='subtitle'>ID Cob.</span>
                   </div>
                 </TableCell>
                 <TableCell>
                   <div className='flex-row align-center' style={{ gap: '1rem' }}>
-                    <img src={btnOrderClients} alt='Botão ordenar clientes na tabela' />
+                    <img
+                      src={btnOrderClients}
+                      style={{ cursor: 'pointer' }}
+                      onClick={() => orderByDate()}
+                      alt='Botão ordenar clientes na tabela'
+                    />
                     <span className='subtitle'>Data de venc.</span>
                   </div>
                 </TableCell>
@@ -99,17 +155,17 @@ export default function ClientChargesTable() {
             </TableHead>
             <TableBody>
               {
-                clientCharges.length > 0 && clientCharges.map((charge, i) => {
+                clientCharges.length > 0 && clientCharges.map((charge) => {
                   return (
                     <TableRow key={charge.id}>
                       <TableCell>
-                        <span className='gray6 medium-body'>{i + 1}</span>
+                        <span className='gray6 medium-body'>{charge.chargeId}</span>
                       </TableCell>
                       <TableCell>
                         <span className='gray6 medium-body'>{charge.due_date}</span>
                       </TableCell>
                       <TableCell>
-                        <span className='gray6 medium-body'>{`R$ ${Number(charge.value).toFixed(2)}`}</span>
+                        <span className='gray6 medium-body'>{`R$ ${formatCentsIntoReais(charge.value)}`}</span>
                       </TableCell>
                       <TableCell>
                         <span className='gray6 medium-body'>
@@ -122,7 +178,7 @@ export default function ClientChargesTable() {
                         </span>
                       </TableCell>
                       <TableCell>
-                        <span className='gray6 medium-body'>{charge.description}</span>
+                        <span className='gray6 medium-body'>{charge.description.slice(0, 8)} ...</span>
                       </TableCell>
                       <TableCell>
                         <div className='flex-row' style={{ justifyContent: 'space-around' }}>

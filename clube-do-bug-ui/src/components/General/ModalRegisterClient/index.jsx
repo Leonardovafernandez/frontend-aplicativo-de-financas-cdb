@@ -4,6 +4,7 @@ import api from '../../../services/api';
 import performZipCodeQuery from "../../../services/performZipCodeQuery";
 import clientsIcon from "./assets/clients-modal.svg";
 import closeIcon from "./assets/close-modal.svg";
+import { getItem } from '../../../utils/storage'
 import "./style.css";
 
 function ModalRegisterClient() {
@@ -102,26 +103,30 @@ function ModalRegisterClient() {
   async function createClient() {
 
     if (!formClient.name) {
-      setClientErrors({ ...clientErrors, name: "Este campo deve ser preenchido" });
+      setClientErrors({ name: "Este campo deve ser preenchido" });
       return
     }
 
     if (!formClient.email) {
-      setClientErrors({ ...clientErrors, email: "Este campo deve ser preenchido", name: "" });
+      setClientErrors({ email: "Este campo deve ser preenchido" });
       return
     }
 
     if (!formClient.cpf) {
-      setClientErrors({ ...clientErrors, cpf: "Este campo deve ser preenchido", email: "" });
+      setClientErrors({ cpf: "Este campo deve ser preenchido" });
       return
     }
 
     if (!formClient.phone) {
-      setClientErrors({ ...clientErrors, phone: "Este campo deve ser preenchido", cpf: "" });
+      setClientErrors({ phone: "Este campo deve ser preenchido" });
       return
     }
     const cpfFOrmated = formClient.cpf.match(/\d+/g).join("");
     const phoneFormated = formClient.phone.match(/\d+/g).join("");
+
+    if (phoneFormated.length < 10) {
+      return setClientErrors({ phone: "Telefone inválido!" })
+    }
 
     try {
       const client = {
@@ -130,7 +135,8 @@ function ModalRegisterClient() {
         phone: phoneFormated
       };
 
-      await api.post('/client', client, { headers: { Authorization: `Bearer ${localStorage.getItem("token")}`, }});
+      await api.post('/client', client, { headers: { Authorization: `Bearer ${getItem("token")}`, } }
+      );
 
       setIsPopup(true)
       setPopupMessage('Cadastro concluído com sucesso')
@@ -139,6 +145,7 @@ function ModalRegisterClient() {
       return
 
     } catch (error) {
+      console.log(error);
       showClientErrors(error)
       return
     }

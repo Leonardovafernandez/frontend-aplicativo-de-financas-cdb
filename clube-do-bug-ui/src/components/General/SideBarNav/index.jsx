@@ -8,15 +8,16 @@ import homePink from "./assets/home-pink.svg";
 import './style.css';
 import { useNavigate } from 'react-router-dom';
 import api from "../../../services/api";
+import { getItem } from "../../../utils/storage";
 
-function SideBarNav({ validateSideBar, setValidateSideBar}) {
+function SideBarNav({ validateSideBar, setValidateSideBar }) {
   const navigate = useNavigate();
 
   const { setBillingTableData, setShowAllClients } = useHome();
 
   const getChargeByStatus = async () => {
     try {
-      const { data: charges } = (await api.get('/charge/status', { headers: { Authorization: `Bearer ${localStorage.getItem("token")}`, }}));
+      const { data: charges } = (await api.get('/charge/status', { headers: { Authorization: `Bearer ${getItem("token")}`, } }));
 
       setBillingTableData(charges);
 

@@ -6,6 +6,7 @@ import IconEyeClose from "./assets/eye-close.svg";
 import IconEyeOpen from "./assets/eye-open.svg";
 import api from "../../../services/api";
 import useHome from "../../../hooks/useHome";
+import { getItem } from "../../../utils/storage";
 
 function ModalEditRegisterUser() {
   const [openModalSuccess, setOpenModalSuccess] = useState(false);
@@ -130,13 +131,13 @@ function ModalEditRegisterUser() {
     try {
       if (formEditUser.password !== "") {
         const { confirmPassword, id, ...editedUser } = formEditUser;
-        await api.put('/user', editedUser, { headers: { Authorization: `Bearer ${localStorage.getItem("token")}`, }});
+        await api.put('/user', editedUser, { headers: { Authorization: `Bearer ${getItem("token")}`, } });
         setUpdatedUser(!updatedUser);
         return openSuccessModal();
       }
 
       const { confirmPassword, password, id, ...editedUser } = formEditUser;
-      await api.put('/user', editedUser, { headers: { Authorization: `Bearer ${localStorage.getItem("token")}`, }});
+      await api.put('/user', editedUser, { headers: { Authorization: `Bearer ${getItem("token")}`, } });
       setUpdatedUser(!updatedUser);
       return openSuccessModal();
 

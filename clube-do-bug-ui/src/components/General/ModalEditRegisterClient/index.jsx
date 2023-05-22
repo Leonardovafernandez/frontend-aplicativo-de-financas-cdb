@@ -5,6 +5,7 @@ import performZipCodeQuery from "../../../services/performZipCodeQuery";
 import clientsIcon from "./assets/clients-modal.svg";
 import closeIcon from "./assets/close-modal.svg";
 import "./style.css";
+import { getItem } from "../../../utils/storage";
 
 function ModalRegisterClient() {
   const { setPopupMessage, setIsPopup,
@@ -110,27 +111,30 @@ function ModalRegisterClient() {
   async function updateClient() {
 
     if (!formClient.name) {
-      setClientErrors({ ...clientErrors, name: "Este campo deve ser preenchido" });
+      setClientErrors({ name: "Este campo deve ser preenchido" });
       return
     }
 
     if (!formClient.email) {
-      setClientErrors({ ...clientErrors, email: "Este campo deve ser preenchido", name: "" });
+      setClientErrors({ email: "Este campo deve ser preenchido" });
       return
     }
 
     if (!formClient.cpf) {
-      setClientErrors({ ...clientErrors, cpf: "Este campo deve ser preenchido", email: "" });
+      setClientErrors({ cpf: "Este campo deve ser preenchido" });
       return
     }
 
     if (!formClient.phone) {
-      setClientErrors({ ...clientErrors, phone: "Este campo deve ser preenchido", cpf: "" });
+      setClientErrors({ phone: "Este campo deve ser preenchido" });
       return
     }
-
     const cpfFOrmated = formClient.cpf.match(/\d+/g).join("");
     const phoneFormated = formClient.phone.match(/\d+/g).join("");
+
+    if (phoneFormated.length < 10) {
+      return setClientErrors({ phone: "Telefone inválido!" })
+    }
 
     try {
       const editClient = {
@@ -139,7 +143,9 @@ function ModalRegisterClient() {
         phone: phoneFormated
       };
 
-      await api.put(`/client/${currentClient.id}`, editClient, { headers: { Authorization: `Bearer ${localStorage.getItem("token")}`, }});
+      await api.put(`/client/${currentClient.id}`, editClient,
+        { headers: { Authorization: `Bearer ${getItem('token')}` } }
+      )
 
       setIsPopup(true)
       setPopupMessage('Cadastro atualizado com sucesso')
@@ -149,6 +155,7 @@ function ModalRegisterClient() {
 
 
     } catch (error) {
+      console.log(error);
       showClientErrors(error)
       return
     }
